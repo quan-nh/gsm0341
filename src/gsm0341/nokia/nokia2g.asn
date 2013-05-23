@@ -1,0 +1,215 @@
+NOKIA DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+
+-- EXPORTS CBSEapdus;
+-- The following defines the choices and tags for the
+-- T-DATA request/indication User Data
+CBSEapdus ::= CHOICE {
+	cbseWriteReplace [1] WriteReplace,
+	cbseKill [2] Kill,
+	cbseReport [3] Report,
+	cbseStatusCBCHQuery [4] StatusCBCHQuery,
+	cbseStatusCBCHQueryResp [5] StatusCBCHQueryResp,
+	cbseStatusMessageQuery [6] StatusMessageQuery,
+	cbseStatusMessageQueryResp [7] StatusMessageQueryResp,
+	cbseReject [8] Reject,
+	cbseRestartIndication [9] RestartIndication,
+	cbseReset [10] Reset,
+	cbseFailureIndication [11] FailureIndication,
+	cbseDisplayMessageQuery [254] DisplayMessageQuery,
+	cbseDisplayMessageQueryResp [255] DisplayMessageQueryResp
+}
+
+-- CBSEapdus cbseSetDRX, cbseSetDRXResp,
+-- cbseBind, cbseBindConfirm, cbseBindFailure
+-- and cbseUnbind are not supported
+WriteReplace ::= SEQUENCE {
+	messageIdentifier [0] INTEGER (0..65535),
+	oldSerialNumber [1] SerialNumber OPTIONAL,
+	newSerialNumber [2] SerialNumber,
+	cellList [3] CellList,
+	channelIndicator [4] Channel OPTIONAL,
+	category [5] INTEGER (1) OPTIONAL,
+	repetitionRate [6] INTEGER (0 .. 11),
+	noOfBroadcastReq [7] INTEGER (0 .. 65535),
+	noOfPages [8] INTEGER (1 .. 15),
+	dataCodingScheme [9] INTEGER (0 .. 255),
+	cbsPageInf [10] SEQUENCE OF PageInf
+}
+
+Channel ::= INTEGER {basicChannel (0)}
+
+PageInf ::= SEQUENCE {
+	messageInfoUsefulOctets [0] INTEGER (0..82),
+	messageInfoPage [1] MessageInfoPage
+}
+
+MessageInfoPage ::= OCTET STRING (SIZE(82))
+
+CellIdDiscBase ::= OCTET STRING (SIZE(1))
+CellIdDisc ::= CellIdDiscBase (lacAndCi | ciOnly)
+CellIdListDiscBase ::= OCTET STRING (SIZE(1))
+CellIdListDisc ::= CellIdListDiscBase (lacAndCi | ciOnly | allCellsOnBSS)
+lacAndCi OCTET STRING ::= '00000001'B -- 2 Octet lac followed by 2 Octet Cell Id
+ciOnly OCTET STRING ::= '00000010'B -- Cell Id only
+allCellsOnBSS OCTET STRING ::= '00000110'B -- All cells on BSS are identified
+CellId ::= OCTET STRING (SIZE(4))
+-- Note: If CellIdDisc equals ciOnly then only the
+-- last 2 octets of CellId are to be considered
+-- and the first 2 octets are filler octets.
+
+Cell ::= SEQUENCE {
+	disc [0] CellIdDisc,
+	id [1] CellId
+}
+
+CellList ::= SEQUENCE {
+	disc [0] CellIdListDisc,
+	cellList [1] SEQUENCE OF SEQUENCE {
+		id [1] CellId
+	} OPTIONAL
+-- If CellIdListDisc equals allCellsOnBSS then
+-- cellList is omitted
+}
+
+SerialNumber ::= INTEGER (0 .. 65535)
+
+Kill ::= SEQUENCE {
+	messageIdentifier [0] INTEGER (0..65535),
+	oldSerialNumber [1] SerialNumber,
+	cellList [2] CellList,
+	channelIndicator [3] Channel OPTIONAL
+}
+
+Report ::= SEQUENCE {
+	messageIdentifier [0] INTEGER (0..65535),
+	serialNumber [1] SerialNumber,
+	noOfBroadcastsComplList [2] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		noOfBroadcastsCompl [1] INTEGER
+	} OPTIONAL,
+	failureList [3] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		cause [1] FailureReason,
+		diagnostic [2] DiagnosticInfo OPTIONAL
+	} OPTIONAL,
+	channelIndicator [4] Channel OPTIONAL
+}
+
+StatusCBCHQuery ::= SEQUENCE {
+	cellList [0] CellList,
+	channelIndicator [1] Channel OPTIONAL
+}
+
+StatusCBCHQueryResp ::= SEQUENCE {
+	cbchLoadingList [0] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		cbchLoading [1] INTEGER (0 .. 100)
+		-- indicates the predicted short term load of the cell
+		-- expressed as a percentage
+	} OPTIONAL,
+	failureList [1] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		cause [1] FailureReason,
+		diagnostic [2] DiagnosticInfo OPTIONAL
+	} OPTIONAL,
+	channelIndicator [2] Channel OPTIONAL
+}
+
+StatusMessageQuery ::= SEQUENCE {
+	messageIdentifier [0] INTEGER (0..65535),
+	currentSerialNo [1] SerialNumber,
+	cellList [2] CellList,
+	channelIndicator [3] Channel OPTIONAL
+}
+
+StatusMessageQueryResp ::= SEQUENCE {
+	messageIdentifier [0] INTEGER (0..65535),
+	oldSerialNumber [1] SerialNumber,
+	noOfBroadcastsComplList [2] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		noOfBroadcastsCompl [1] INTEGER
+	} OPTIONAL,
+	failureList [3] SEQUENCE OF SEQUENCE {
+		cellId [0] Cell,
+		cause [1] FailureReason,
+		diagnostic [2] DiagnosticInfo OPTIONAL
+	} OPTIONAL,
+	channelIndicator [4] Channel OPTIONAL
+}
+
+Reject ::= SEQUENCE {
+	cause [0] FailureReason,
+	diagnostic [1] DiagnosticInfo OPTIONAL,
+	messageIdentifier [2] INTEGER (0..65535)OPTIONAL,
+	serialNumber [3] SerialNumber OPTIONAL
+}
+
+FailureReason ::= INTEGER {
+	parameterNotRecognised (0),
+	--(1),-- -- not used
+	parameterValueInvalid (2),
+	validCBSMessageNotIdentified (3),
+	cellIdentityNotValid (4),
+	unrecognisedMessage (5),
+	missingMandatoryElement (6),
+	bssCapacityExceeded (7),
+	cellMemoryExceeded (8),
+	bssMemoryExceeded (9),
+	unspecifiedError (10),
+	incompatibleDRXParameter (11),
+	--(12),-- -- not used
+	cellBroadcastNotSupported (13),
+	cellBroadcastNotOperational (14),
+	messageReferenceAlreadyUsed (15),
+	cbcInterfaceNotSupported (255)
+}
+
+DiagnosticInfo ::= OCTET STRING (SIZE (1..20))
+
+RestartIndication ::= SEQUENCE {
+	cellList [0] CellList,
+	recoveryIndication [1] BOOLEAN OPTIONAL
+}
+
+-- recoveryIndication values dataAvailable (TRUE), dataLost (FALSE)
+dataAvailable BOOLEAN ::= TRUE
+dataLost BOOLEAN ::= FALSE
+
+Reset ::= SEQUENCE {
+	cellList CellList
+}
+
+FailureIndication ::= SEQUENCE {
+	cellList CellList
+}
+
+DisplayMessageQuery ::= SEQUENCE {
+	contentOfDisplay [0] INTEGER (0 .. 2),
+	messageIdentifier [1] INTEGER (0..65535) OPTIONAL,
+	currentSerialNo [2] SerialNumber OPTIONAL,
+	cellId [3] Cell OPTIONAL,
+	channelIndicator [4] Channel OPTIONAL
+}
+
+DisplayMessageQueryResp ::= SEQUENCE {
+	moreInformation [0] BOOLEAN,
+	messageIdentifier [1] INTEGER (0..65535) OPTIONAL,
+	oldSerialNumber [2] SerialNumber OPTIONAL,
+	category [3] INTEGER (1) OPTIONAL,
+	repetitionRate [4] INTEGER (0 .. 11) OPTIONAL,
+	noOfBroadcastReq [5] INTEGER (0 .. 65535) OPTIONAL,
+	noOfPages [6] INTEGER (1 .. 15) OPTIONAL,
+	dataCodingScheme [7] INTEGER (0 .. 255) OPTIONAL,
+	cbsPageInf [8] SEQUENCE OF MessageInfoPage OPTIONAL,
+	noOfBroadcastsCompl [9] INTEGER OPTIONAL,
+	cellId [10] Cell OPTIONAL,
+	channelIndicator [11] Channel OPTIONAL
+}
+
+-- moreInformation values moreMessages (TRUE),
+-- noMoreMessages (FALSE)
+moreMessages BOOLEAN ::= TRUE
+noMoreMessages BOOLEAN ::= FALSE
+
+END
