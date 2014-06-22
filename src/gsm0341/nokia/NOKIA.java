@@ -185,29 +185,29 @@ public class NOKIA {
 		// test encode cbch query
 		byte[] cbchQuery = encodeStatusCBCHQuery(cellIds);
 		CharsetTools.printHex(cbchQuery);
-		System.out.println("--StatusCBCHQuery");
+		System.out.println("->StatusCBCHQuery");
 
 		// test encode reset
 		byte[] reset = encodeReset(cellIds);
 		CharsetTools.printHex(reset);
-		System.out.println("--Reset");
+		System.out.println("->Reset");
 
 		// test reject check
 		String rejectMessage = "A8 80 80 01 02 00 00";
 		byte[] reject = CharsetTools.hexStringToByteArray(rejectMessage);
 		System.out.println(rejectMessage);
-		System.out.println(isReject(reject) ? "--Reject" : "--not Reject");
+		System.out.println(isReject(reject) ? "->Reject" : "->not Reject");
 
 		// test StatusCBCHQueryResp check
 		String cbchQueryResp = "A5 80 A0 80 30 80 A0 80 80 01 01 81 04 4E CA DA CB 00 00 81 01 03 00 00 00 00 82 01 00 00 00";
 		byte[] statusCBCHQueryResp = CharsetTools.hexStringToByteArray(cbchQueryResp);
 		System.out.println(cbchQueryResp);
-		System.out.println(isStatusCBCHQueryResp(statusCBCHQueryResp) ? "--StatusCBCHQueryResp" : "--not StatusCBCHQueryResp");
+		System.out.println(isStatusCBCHQueryResp(statusCBCHQueryResp) ? "->StatusCBCHQueryResp" : "->not StatusCBCHQueryResp");
 
 		// test Report check
 		String reportMessage = "A3 80 80 02 04 D2 81 02 01 59 A2 80 30 80 A0 80 80 01 01 81 04 4E CA DA CB 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA CC 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA CD 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA D5 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA D6 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA D7 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA DF 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA E0 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA E1 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA E9 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA EA 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA EB 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA F3 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA F4 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA F5 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA FD 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA FE 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DA FF 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 07 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 08 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 09 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 11 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 12 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 13 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 1B 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 1C 00 00 81 01 00 00 00 30 80 A0 80 80 01 01 81 04 4E CA DB 1D 00 00 81 01 00 00 00 00 00 84 01 00 00 00";
 		byte[] report = CharsetTools.hexStringToByteArray(reportMessage);
 		System.out.println(reportMessage);
-		System.out.println(isReport(report) ? "--Report" : "--not Report");
+		System.out.println(isReport(report) ? "->Report" : "->not Report");
 	}
 }
